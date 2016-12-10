@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: "io.franzbecker.gradle-lombok"
 
 android {
     compileSdkVersion 24
@@ -35,5 +36,6 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.github.pires:obd-java-api:1.0'
     compile 'com.github.glomadrian:velocimeterlibrary:1.0'
+    provided "org.projectlombok:lombok:1.12.6"
 
 }

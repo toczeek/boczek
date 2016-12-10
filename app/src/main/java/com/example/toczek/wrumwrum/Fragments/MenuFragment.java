@@ -1,23 +1,24 @@
-package com.example.toczek.wrumwrum;
+package com.example.toczek.wrumwrum.Fragments;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.gc.materialdesign.views.ButtonRectangle;
+import com.example.toczek.wrumwrum.R;
 import com.github.glomadrian.velocimeterlibrary.VelocimeterView;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
@@ -53,17 +54,14 @@ public class MenuFragment extends Fragment {
     SpeedCommand speedCommand = new SpeedCommand();
     @BindView(R.id.button1)
     Button mButton;
-    @BindView(R.id.speedTv)
-    TextView speedTv;
-    @BindView(R.id.rpmTv)
-    TextView rpmTv;
+
     @BindView(R.id.rpmVelocimeter)
     VelocimeterView rpmVelocimeter;
     @BindView(R.id.speedVelocimeter)
     VelocimeterView speedVelocimeter;
     @OnClick(R.id.button1)
     public void onClickBtn1() {
-        mButton.setText("lubie boczek");
+        showHelpDialog();
     }
     @OnClick(R.id.button)
     public void OnClickBtn() {
@@ -77,6 +75,21 @@ public class MenuFragment extends Fragment {
 
         pairingHandler = new Handler();
         return view;
+    }
+    private void showHelpDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .create();
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View dialogLayout = inflater.inflate(R.layout.dialog_help, null);
+        dialog.setView(dialogLayout);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        dialog.show();
     }
     private void showBTDeviceDialog() {
         ArrayList deviceStrs = new ArrayList();
@@ -143,10 +156,10 @@ public class MenuFragment extends Fragment {
                             engineRpmCommand.run(socket.getInputStream(), socket.getOutputStream());
                             speedCommand.run(socket.getInputStream(), socket.getOutputStream());
                             Log.d(TAG, "RPM: " + engineRpmCommand.getFormattedResult());
-                            rpmTv.setText(engineRpmCommand.getFormattedResult());
+
                             rpmVelocimeter.setValue(engineRpmCommand.getRPM(),true);
                             Log.d(TAG, "Speed: " + speedCommand.getFormattedResult());
-                            speedTv.setText(speedCommand.getFormattedResult());
+
                             speedVelocimeter.setValue(speedCommand.getMetricSpeed());
                         } catch (IOException e) {
                             e.printStackTrace();
