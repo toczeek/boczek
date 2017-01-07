@@ -37,5 +37,6 @@ dependencies {
     compile 'com.github.pires:obd-java-api:1.0'
     compile 'com.github.glomadrian:velocimeterlibrary:1.0'
     provided "org.projectlombok:lombok:1.12.6"
+    compile 'com.github.anastr:speedviewlib:1.1.2'
 
 }

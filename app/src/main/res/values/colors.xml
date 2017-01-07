@@ -5,6 +5,7 @@
     <color name="colorAccent">#b29e9e</color>
     <color name="colorBackground">#595959</color>
     <color name="colorNavi">#4c0505</color>
-    <color name="colorFont">#d6cdcd</color>
+    <color name="colorFont">#e6dcdc</color>
     <color name="colorButton">#6e0000</color>
+    <color name="colorApp">#3d3535</color>
 </resources>

@@ -16,6 +16,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="asdadasdasdadaasdasasas"/>
+        android:text="W celu połączenia się z aplikacją: \n \n
+        1. Zlokalizuj złącze OBDII w swoim samochodzie. Na powyższym obrazku zaznaczone są miejsca, gdzie mogło zostać umieszone przez producenta. \n
+        2. Podepnij moduł ELM 327 do złącza. \n
+        3. Sparuj swój telefon z modułem poprzez ustawienia w swoim telefonie. Wymagane będzie podanie kodu PIN (1234, 0000 lub kod podany w nazwie urządzenia). \n
+        4. W aplikacji połącz się ze sparowanym modułem. Przy prawidłowym podłączeniu, powinna zamigać zielona dioda na module. \n
+        5. Gotowe! Teraz możesz swobodnie korzystać z aplikacji."/>
+
 
 </LinearLayout>

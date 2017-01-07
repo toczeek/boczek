@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.toczek.wrumwrum.R;
+import com.github.anastr.speedviewlib.ImageSpeedometer;
+import com.github.anastr.speedviewlib.SpeedView;
 import com.github.glomadrian.velocimeterlibrary.VelocimeterView;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;

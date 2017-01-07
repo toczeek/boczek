@@ -14,7 +14,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.example.toczek.wrumwrum.Fragments.DetailsFragment;
 import com.example.toczek.wrumwrum.Fragments.ErrorFragment;
+import com.example.toczek.wrumwrum.Fragments.LogbookFragment;
 import com.example.toczek.wrumwrum.Fragments.MenuFragment;
 import com.example.toczek.wrumwrum.R;
 import com.example.toczek.wrumwrum.Utils.adapters.NavigationAdapter;
@@ -59,9 +61,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
     private void setupNavigationDrawer(){
         mNavItems = new ArrayList<>();
+        mNavItems.add(new NavItem(android.R.drawable.ic_menu_view, "Start", (Fragment) new MenuFragment()));
         mNavItems.add(new NavItem(android.R.drawable.ic_menu_delete, "Diagnostyka", (Fragment) new ErrorFragment()));
-        mNavItems.add(new NavItem(android.R.drawable.ic_menu_camera, "Szczegółowe dane", null));
-        mNavItems.add(new NavItem(android.R.drawable.ic_menu_help, "Logbook", null));
+        mNavItems.add(new NavItem(android.R.drawable.ic_menu_camera, "Szczegółowe dane", (Fragment) new DetailsFragment()));
+        mNavItems.add(new NavItem(android.R.drawable.ic_menu_help, "Logbook", (Fragment) new LogbookFragment()));
 
         mDrawerList.setAdapter(new NavigationAdapter(this, mNavItems));
         // Set the list's click listener

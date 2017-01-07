@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
         android:id="@+id/fragment_container"
         android:padding="@dimen/activity_horizontal_margin"
+        android:background="@color/colorApp"
         >
     </FrameLayout>
 
@@ -20,4 +21,5 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
         android:background="@color/colorNavi"/>
+
 </android.support.v4.widget.DrawerLayout>
