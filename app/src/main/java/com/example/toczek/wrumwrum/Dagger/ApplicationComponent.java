@@ -2,6 +2,7 @@ package com.example.toczek.wrumwrum.Dagger;
 
 
 import com.example.toczek.wrumwrum.MyApplication;
+import com.example.toczek.wrumwrum.Utils.providers.Fragments.DetailsFragmentProvider;
 import com.example.toczek.wrumwrum.Utils.providers.Fragments.MenuFragmentProvider;
 
 import javax.inject.Singleton;
@@ -14,4 +15,5 @@ import dagger.Component;
 public interface ApplicationComponent {
     void inject(MyApplication myApplication);
     void inject(MenuFragmentProvider menuFragmentProvider);
+    void inject(DetailsFragmentProvider detailsFragmentProvider);
 }

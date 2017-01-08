@@ -2,6 +2,8 @@ package com.example.toczek.wrumwrum;
 
 import android.app.Application;
 
+import com.example.toczek.wrumwrum.Fragments.DetailsFragment;
+import com.example.toczek.wrumwrum.Utils.providers.Fragments.DetailsFragmentProvider;
 import com.example.toczek.wrumwrum.Utils.providers.Fragments.MenuFragmentProvider;
 
 import com.example.toczek.wrumwrum.Dagger.ApplicationComponent;
@@ -19,6 +21,10 @@ public class MyApplication extends Application {
 
     public static void inject(MenuFragmentProvider menuFragmentProvider) {
         mApplicationComponent.inject(menuFragmentProvider);
+    }
+
+    public static void inject(DetailsFragmentProvider detailsFragmentProvider) {
+        mApplicationComponent.inject(detailsFragmentProvider);
     }
 
 

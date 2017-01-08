@@ -16,6 +16,7 @@ public class MenuFragmentProvider {
 
     public void setObdListener(ObdListener obdListener) {
         mObdProvider.setObdListener(obdListener);
+        mObdProvider.setMode(0);
     }
 
     public int getSpeed() {
