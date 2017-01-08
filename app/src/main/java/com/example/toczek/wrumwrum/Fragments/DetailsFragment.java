@@ -19,6 +19,18 @@ import butterknife.ButterKnife;
 public class DetailsFragment extends Fragment {
     @BindView(R.id.details_fragment_air_temp)
     TextView mAirTempTv;
+    @BindView(R.id.details_fragment_coolant_temp)
+    TextView mCoolantTempTv;
+    @BindView(R.id.details_fragment_oil_temp)
+    TextView mOilTempTv;
+    @BindView(R.id.details_fragment_consumption_rate)
+    TextView mConsumptionRateTempTv;
+    @BindView(R.id.details_fragment_barometric_pressure)
+    TextView mBarometricPressureTv;
+    @BindView(R.id.details_fragment_fuel_pressure)
+    TextView mFuelPressureTv;
+    @BindView(R.id.details_fragment_fuel_level)
+    TextView mFuelLevelTv;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

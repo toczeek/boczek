@@ -53,12 +53,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ciśnienie paliwa:"
                 android:layout_gravity="left"/>
-            <TextView
-                android:layout_marginBottom="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ciśnienie kolektora dolotowego:"
-                android:layout_gravity="left"/>
+
             <TextView
                 android:layout_marginBottom="5dp"
                 android:layout_width="wrap_content"
@@ -73,6 +68,42 @@
             android:layout_height="wrap_content">
             <TextView
                 android:id="@+id/details_fragment_air_temp"
+                android:layout_marginBottom="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"/>
+            <TextView
+                android:id="@+id/details_fragment_coolant_temp"
+                android:layout_marginBottom="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"/>
+            <TextView
+                android:id="@+id/details_fragment_oil_temp"
+                android:layout_marginBottom="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"/>
+            <TextView
+                android:id="@+id/details_fragment_consumption_rate"
+                android:layout_marginBottom="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"/>
+            <TextView
+                android:id="@+id/details_fragment_barometric_pressure"
+                android:layout_marginBottom="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"/>
+            <TextView
+                android:id="@+id/details_fragment_fuel_pressure"
+                android:layout_marginBottom="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"/>
+            <TextView
+                android:id="@+id/details_fragment_fuel_level"
                 android:layout_marginBottom="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
