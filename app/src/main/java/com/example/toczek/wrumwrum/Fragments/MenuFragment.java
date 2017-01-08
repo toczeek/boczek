@@ -20,6 +20,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.toczek.wrumwrum.R;
+import com.example.toczek.wrumwrum.Utils.providers.Fragments.MenuFragmentProvider;
+import com.example.toczek.wrumwrum.Utils.providers.Obd.ObdListener;
 import com.github.glomadrian.velocimeterlibrary.VelocimeterView;
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
@@ -35,6 +37,7 @@ import com.github.pires.obd.commands.protocol.ObdResetCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
 import com.github.pires.obd.commands.temperature.AmbientAirTemperatureCommand;
+import com.github.pires.obd.commands.temperature.EngineCoolantTemperatureCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 
 import java.io.IOException;
@@ -52,27 +55,11 @@ import static android.content.ContentValues.TAG;
  * Created by Toczek on 2016-12-08.
  */
 
-public class MenuFragment extends Fragment {
-    private String deviceAddress;
-    BluetoothSocket socket = null;
-    HandlerThread handlerThread;
-    Handler mainHandler;
-    Runnable mainRunnable;
+public class MenuFragment extends Fragment implements ObdListener {
 
-    LoadCommand loadCommand = null;
-    AbsoluteLoadCommand absLoadCommand = null;
-    OilTempCommand oilTempCommand = null;
-    ObdCommand coolantTempCommand = null;
-    RPMCommand rpmCommand = null;
-    SpeedCommand speedCommand = null;
-    RuntimeCommand runtimeCommand = null;
-    FuelLevelCommand fuelLevel = null;
-    ObdCommand egrErrorCommand = null;
-    ObdCommand commandedEgrErrorCommand = null;
-
+    private MenuFragmentProvider mMenuFragmentProvider;
     @BindView(R.id.button1)
     Button mButton;
-
     @BindView(R.id.rpmVelocimeter)
     VelocimeterView rpmVelocimeter;
     @BindView(R.id.speedVelocimeter)
@@ -90,9 +77,8 @@ public class MenuFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
         ButterKnife.bind(this, view);
-        handlerThread = new HandlerThread("");
-        handlerThread.start();
-        mainHandler = new Handler(handlerThread.getLooper());
+        mMenuFragmentProvider = new MenuFragmentProvider();
+        mMenuFragmentProvider.setObdListener(this);
         return view;
     }
     private void showHelpDialog() {
@@ -135,247 +121,13 @@ public class MenuFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 try {
-                    //Log.d("OBDHACK", "init-------------: ");
                     dialog.dismiss();
                     int position = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
                     String deviceAddress = devices.get(position).toString();
-                    // TODO save deviceAddress
-                    //--------------------------------
-                    //Log.d("OBDHACK", "22222222222222222-------------: ");
-                    Log.d("OBDHACK", "1-------------: ");
-                    BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
-                    Log.d("OBDHACK", "2-------------: ");
-                    BluetoothDevice device = btAdapter.getRemoteDevice(deviceAddress);
-                    Log.d("OBDHACK", "3-------------: ");
-                    UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");//AA:BB:CC:11:22:33");
-
-                    Log.d("OBDHACK", "4-------------: ");
-
-                    socket = device.createInsecureRfcommSocketToServiceRecord(uuid);
-                    Log.d("OBDHACK", "5-------------: ");
-                    socket.connect();
-                    Log.d("OBDHACK", "6-------------: ");
-                    //-------------------------------------
-                    try {
-                        new ObdResetCommand().run(socket.getInputStream(), socket.getOutputStream());
-                        //Below is to give the adapter enough time to reset before sending the commands, otherwise the first startup commands could be ignored.
-                        try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
-
-                        Log.d("OBDHACK", "3333333333333333333-------------: ");
-                        new EchoOffCommand().run(socket.getInputStream(), socket.getOutputStream());
-                        Log.d("OBDHACK", "7-------------: ");
-                        new LineFeedOffCommand().run(socket.getInputStream(), socket.getOutputStream());
-                        Log.d("OBDHACK", "8-------------: ");
-                        new TimeoutCommand(10).run(socket.getInputStream(), socket.getOutputStream());
-                        Log.d("OBDHACK", "9-------------: ");
-                        new SelectProtocolCommand(ObdProtocols.AUTO).run(socket.getInputStream(), socket.getOutputStream());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.d("OBDHACK", "ER: " + e);
-                    }
-                    //-------------------------------------------------
-                    //Log.d("OBDHACK", "4444444444444444444-------------: ");
+                    mMenuFragmentProvider.setupObdAndStart(deviceAddress);
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d("OBDHACK", "ER: " + e);
-                }
-                try {
-
-                    try {
-                        loadCommand = new LoadCommand();//04#
-                        absLoadCommand = new AbsoluteLoadCommand();//43#
-
-                        oilTempCommand = new OilTempCommand();
-                        coolantTempCommand = new ObdCommand("01 05") {
-                            @Override
-                            protected void performCalculations() {
-                            }
-
-                            @Override
-                            public String getFormattedResult() {
-                                return null;
-                            }
-
-                            @Override
-                            public String getCalculatedResult() {
-                                return null;
-                            }
-
-                            @Override
-                            public String getName() {
-                                return null;
-                            }
-                        };
-
-                        rpmCommand = new RPMCommand();
-
-                        speedCommand = new SpeedCommand();
-
-                        runtimeCommand = new RuntimeCommand();
-
-                        fuelLevel = new FuelLevelCommand();
-
-                        egrErrorCommand = new ObdCommand("01 2D") {
-                            @Override
-                            protected void performCalculations() {
-                            }
-
-                            @Override
-                            public String getFormattedResult() {
-                                return null;
-                            }
-
-                            @Override
-                            public String getCalculatedResult() {
-                                return null;
-                            }
-
-                            @Override
-                            public String getName() {
-                                return null;
-                            }
-                        };
-
-                        commandedEgrErrorCommand = new ObdCommand("01 2D") {
-                            @Override
-                            protected void performCalculations() {
-                            }
-
-                            @Override
-                            public String getFormattedResult() {
-                                return null;
-                            }
-
-                            @Override
-                            public String getCalculatedResult() {
-                                return null;
-                            }
-
-                            @Override
-                            public String getName() {
-                                return null;
-                            }
-                        };
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Log.d("OBDHACK", "ER: " + e);
-                    }
-                    //ObdMultiCommand obdCommand=new ObdMultiCommand();
-                    mainRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            while(true) {
-                                /*
-                            try {
-                                loadCommand.run(socket.getInputStream(), socket.getOutputStream());
-
-                                Log.d("OBDHACK_RES", "Load: " + loadCommand.getFormattedResult());
-
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E1: " + e);
-                            }
-                            try {
-                                absLoadCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                Log.d("OBDHACK_RES", "Abs Load: " + absLoadCommand.getResult());
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E2: " + e);
-                            }
-
-                            try {
-                                oilTempCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                Log.d("OBDHACK_RES", "Oil temp: " + oilTempCommand.getResult());
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E3: " + e);
-                            }
-                            try {
-                                coolantTempCommand.run(socket.getInputStream(), socket.getOutputStream());
-
-                                Log.d("OBDHACK_RES", "Coolant temp: " + coolantTempCommand.getResult());
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E4: " + e);
-                            }
-                            */
-                            try {
-                                rpmCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                String rpmResult = rpmCommand.getResult();
-                                rpmResult = rpmResult.substring(rpmResult.length() - 4);
-                                int rpmInt = Integer.parseInt(rpmResult, 16) / 4;
-                                Log.d("OBDHACK_RES", "Rpm: " + rpmInt);
-                                rpmVelocimeter.setValue(rpmInt, false);
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E5: " + e);
-                            }
-                            try {
-                                speedCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                String speedResult = speedCommand.getResult();
-                                speedResult = speedResult.substring(speedResult.length() - 2);
-                                int speedInt = Integer.parseInt(speedResult, 16);
-                                Log.d("OBDHACK_RES", "Speed: " + speedInt);
-                                speedVelocimeter.setValue(speedInt, false);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E6: " + e);
-                            }
-
-/*
-                            try {
-                                runtimeCommand.run(socket.getInputStream(), socket.getOutputStream());
-
-                                Log.d("OBDHACK_RES", "Runtime since start: " + runtimeCommand.getResult());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E8: " + e);
-                            }
-
-                            try {
-                                fuelLevel.run(socket.getInputStream(), socket.getOutputStream());
-
-                                Log.d("OBDHACK_RES", "Fuel level: " + fuelLevel.getResult());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E9: " + e);
-                            }
-
-                            try {
-                                egrErrorCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                Log.d("OBDHACK_RES", "Egr err: " + egrErrorCommand.getResult());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E10: " + e);
-                            }
-                            try {
-                                commandedEgrErrorCommand.run(socket.getInputStream(), socket.getOutputStream());
-
-                                Log.d("OBDHACK_RES", "Commanded egr err: " + commandedEgrErrorCommand.getResult());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E11: " + e);
-                            }
-                            */
-                            //obdCommand.run(socket.getInputStream(), socket.getOutputStream());
-
-
-                            //Log.d("OBDHACK_RES", "Obd data: " + obdCommand.getResult());
-
-                            }
-                        }
-                    };
-                    mainHandler.post(mainRunnable);
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Log.d("OBDHACK", "E: " + e);
                 }
                 //---------------------------------------------
             }
@@ -384,5 +136,13 @@ public class MenuFragment extends Fragment {
 
         alertDialog.setTitle("Choose Bluetooth device");
         alertDialog.show();
+    }
+
+    @Override
+    public void wasUpdate() {
+        if (mMenuFragmentProvider != null) {
+            speedVelocimeter.setValue(mMenuFragmentProvider.getSpeed(), false);
+            rpmVelocimeter.setValue(mMenuFragmentProvider.getRpm(), false);
+        }
     }
 }
