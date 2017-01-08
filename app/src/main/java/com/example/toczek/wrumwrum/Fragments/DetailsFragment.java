@@ -40,7 +40,7 @@ public class DetailsFragment extends Fragment implements ObdListener {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.details_fragement, container, false);
-        ButterKnife.bind(view);
+        ButterKnife.bind(this, view);
         mDetailsFragmentProvider = new DetailsFragmentProvider();
         return view;
     }
@@ -53,12 +53,20 @@ public class DetailsFragment extends Fragment implements ObdListener {
 
     @Override
     public void wasUpdate() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                getData();
+            }
+        });
+    }
+    private void getData() {
+        mAirTempTv.setText(""+mDetailsFragmentProvider.getAirTemp());
         mCoolantTempTv.setText(""+mDetailsFragmentProvider.getCoolantTemp());
         mBarometricPressureTv.setText(""+mDetailsFragmentProvider.getBarometricPressure());
         mConsumptionRateTempTv.setText(""+mDetailsFragmentProvider.getConsumptionRate());
         mFuelLevelTv.setText(""+mDetailsFragmentProvider.getFuelLevel());
         mFuelPressureTv.setText(""+mDetailsFragmentProvider.getFuelPressure());
         mOilTempTv.setText(""+mDetailsFragmentProvider.getOilTemp());
-
     }
 }
