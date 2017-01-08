@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.toczek.wrumwrum.R;
+import com.example.toczek.wrumwrum.Utils.providers.Fragments.DetailsFragmentProvider;
+import com.example.toczek.wrumwrum.Utils.providers.Obd.ObdListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -16,7 +18,8 @@ import butterknife.ButterKnife;
  * Created by Toczek on 2017-01-07.
  */
 
-public class DetailsFragment extends Fragment {
+public class DetailsFragment extends Fragment implements ObdListener {
+    private DetailsFragmentProvider mDetailsFragmentProvider;
     @BindView(R.id.details_fragment_air_temp)
     TextView mAirTempTv;
     @BindView(R.id.details_fragment_coolant_temp)
@@ -38,6 +41,24 @@ public class DetailsFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.details_fragement, container, false);
         ButterKnife.bind(view);
+        mDetailsFragmentProvider = new DetailsFragmentProvider();
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mDetailsFragmentProvider.setObdListener(this);
+    }
+
+    @Override
+    public void wasUpdate() {
+        mCoolantTempTv.setText(""+mDetailsFragmentProvider.getCoolantTemp());
+        mBarometricPressureTv.setText(""+mDetailsFragmentProvider.getBarometricPressure());
+        mConsumptionRateTempTv.setText(""+mDetailsFragmentProvider.getConsumptionRate());
+        mFuelLevelTv.setText(""+mDetailsFragmentProvider.getFuelLevel());
+        mFuelPressureTv.setText(""+mDetailsFragmentProvider.getFuelPressure());
+        mOilTempTv.setText(""+mDetailsFragmentProvider.getOilTemp());
+
     }
 }

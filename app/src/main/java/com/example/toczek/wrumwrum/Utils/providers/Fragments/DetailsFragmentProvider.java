@@ -19,6 +19,10 @@ public class DetailsFragmentProvider {
         mObdProvider.setMode(1);
     }
 
+    public int getAirTemp() {
+        return mObdProvider.getAirTemp();
+    }
+
     public int getCoolantTemp() {
         return mObdProvider.getCoolantTemp();
     }
@@ -44,9 +48,6 @@ public class DetailsFragmentProvider {
     }
 
 
-    public int getRpm() {
-        return mObdProvider.getRpmValue();
-    }
 
 
 }

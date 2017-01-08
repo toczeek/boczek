@@ -78,7 +78,6 @@ public class MenuFragment extends Fragment implements ObdListener {
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
         ButterKnife.bind(this, view);
         mMenuFragmentProvider = new MenuFragmentProvider();
-        mMenuFragmentProvider.setObdListener(this);
         return view;
     }
     private void showHelpDialog() {
@@ -144,5 +143,11 @@ public class MenuFragment extends Fragment implements ObdListener {
             speedVelocimeter.setValue(mMenuFragmentProvider.getSpeed(), false);
             rpmVelocimeter.setValue(mMenuFragmentProvider.getRpm(), false);
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mMenuFragmentProvider.setObdListener(this);
     }
 }

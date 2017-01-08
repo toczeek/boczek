@@ -14,12 +14,16 @@ import com.github.pires.obd.commands.engine.LoadCommand;
 import com.github.pires.obd.commands.engine.OilTempCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
+import com.github.pires.obd.commands.fuel.ConsumptionRateCommand;
 import com.github.pires.obd.commands.fuel.FuelLevelCommand;
+import com.github.pires.obd.commands.pressure.BarometricPressureCommand;
+import com.github.pires.obd.commands.pressure.FuelPressureCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
 import com.github.pires.obd.commands.protocol.LineFeedOffCommand;
 import com.github.pires.obd.commands.protocol.ObdResetCommand;
 import com.github.pires.obd.commands.protocol.SelectProtocolCommand;
 import com.github.pires.obd.commands.protocol.TimeoutCommand;
+import com.github.pires.obd.commands.temperature.AmbientAirTemperatureCommand;
 import com.github.pires.obd.commands.temperature.EngineCoolantTemperatureCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 
@@ -31,19 +35,6 @@ import lombok.Data;
 @Data
 public class ObdProvider {
     BluetoothSocket socket = null;
-    private boolean isObdConnected;
-
-    private int mode; //TODO : change to state object
-
-    private int rpmValue;
-    private int speedValue;
-
-    private int coolantTemp;
-    private int oilTemp;
-    private int fuelLevel;
-    private int consumptionRate;
-    private int barometricPressure;
-    private int fuelPressure;
 
     private ObdListener obdListener;
     private String deviceAddress;
@@ -52,16 +43,33 @@ public class ObdProvider {
     private Handler mainHandler;
     private Runnable mainRunnable;
 
-    private LoadCommand loadCommand = null;
-    private AbsoluteLoadCommand absLoadCommand = null;
-    private OilTempCommand oilTempCommand = null;
-    private ObdCommand coolantTempCommand = null;
+    private boolean isObdConnected;
+
+    private int mode; //TODO : change to state object
+
+    //VALUES
+    private int rpmValue;
+    private int speedValue;
+
+    private int airTemp;
+    private int coolantTemp;
+    private int oilTemp;
+    private int fuelLevel;
+    private int consumptionRate;
+    private int barometricPressure;
+    private int fuelPressure;
+
+    //COMMANDS
     private RPMCommand rpmCommand = null;
     private SpeedCommand speedCommand = null;
-    private RuntimeCommand runtimeCommand = null;
+
+    private AmbientAirTemperatureCommand ambientAirTemperatureCommand = null;
+    private OilTempCommand oilTempCommand = null;
+    private EngineCoolantTemperatureCommand coolantTempCommand = null;
     private FuelLevelCommand fuelLevelCommand = null;
-    private ObdCommand egrErrorCommand = null;
-    private ObdCommand commandedEgrErrorCommand = null;
+    private FuelPressureCommand fuelPressureCommand = null;
+    private ConsumptionRateCommand consumptionRateCommand = null;
+    private BarometricPressureCommand barometricPressureCommand = null;
 
     public ObdProvider() {
         handlerThread = new HandlerThread("");
@@ -112,60 +120,15 @@ public class ObdProvider {
     
     public void setupCommands() {
         try {
-            loadCommand = new LoadCommand();//04#
-            absLoadCommand = new AbsoluteLoadCommand();//43#
+            rpmCommand = new RPMCommand();
+            speedCommand = new SpeedCommand();
 
             oilTempCommand = new OilTempCommand();
             coolantTempCommand = new EngineCoolantTemperatureCommand();
-            rpmCommand = new RPMCommand();
-
-            speedCommand = new SpeedCommand();
-
-            runtimeCommand = new RuntimeCommand();
-
             fuelLevelCommand = new FuelLevelCommand();
-
-            egrErrorCommand = new ObdCommand("01 2D") {
-                @Override
-                protected void performCalculations() {
-                }
-
-                @Override
-                public String getFormattedResult() {
-                    return null;
-                }
-
-                @Override
-                public String getCalculatedResult() {
-                    return null;
-                }
-
-                @Override
-                public String getName() {
-                    return null;
-                }
-            };
-
-            commandedEgrErrorCommand = new ObdCommand("01 2D") {
-                @Override
-                protected void performCalculations() {
-                }
-
-                @Override
-                public String getFormattedResult() {
-                    return null;
-                }
-
-                @Override
-                public String getCalculatedResult() {
-                    return null;
-                }
-
-                @Override
-                public String getName() {
-                    return null;
-                }
-            };
+            fuelPressureCommand = new FuelPressureCommand();
+            consumptionRateCommand = new ConsumptionRateCommand();
+            barometricPressureCommand = new BarometricPressureCommand();
         } catch (Exception e) {
             e.printStackTrace();
             Log.d("OBDlog", "ER: " + e);
@@ -182,9 +145,7 @@ public class ObdProvider {
                         if (mode == 0) {
                             try {
                                 rpmCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                String rpmResult = rpmCommand.getResult();
-                                rpmResult = rpmResult.substring(rpmResult.length() - 4);
-                                rpmValue = Integer.parseInt(rpmResult, 16) / 4;
+                                rpmValue = getIntValue(rpmCommand.getResult(), 4)/4;
                                 Log.d("OBDHACK_RES", "Rpm: " + rpmValue);
 
                             } catch (Exception e) {
@@ -193,9 +154,7 @@ public class ObdProvider {
                             }
                             try {
                                 speedCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                String speedResult = speedCommand.getResult();
-                                speedResult = speedResult.substring(speedResult.length() - 2);
-                                speedValue = Integer.parseInt(speedResult, 16);
+                                speedValue = getIntValue(speedCommand.getResult(), 2);
                                 Log.d("OBDHACK_RES", "Speed: " + speedValue);
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -204,27 +163,18 @@ public class ObdProvider {
                         }
                         else {
                             try {
-                                loadCommand.run(socket.getInputStream(), socket.getOutputStream());
-
-                                Log.d("OBDHACK_RES", "Load: " + loadCommand.getFormattedResult());
-
-
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E1: " + e);
-                            }
-                            try {
-                                absLoadCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                Log.d("OBDHACK_RES", "Abs Load: " + absLoadCommand.getResult());
+                                ambientAirTemperatureCommand.run(socket.getInputStream(), socket.getOutputStream());
+                                airTemp = getIntValue(ambientAirTemperatureCommand.getResult(), 2) - 40;
+                                Log.d("OBDHACK_RES", "Air temp: " + airTemp);
 
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                Log.d("OBDHACK", "E2: " + e);
+                                Log.d("OBDHACK", "E3: " + e);
                             }
-
                             try {
                                 oilTempCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                Log.d("OBDHACK_RES", "Oil temp: " + oilTempCommand.getResult());
+                                oilTemp = getIntValue(oilTempCommand.getResult(), 2) - 40;
+                                Log.d("OBDHACK_RES", "Oil temp: " + oilTemp);
 
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -232,8 +182,8 @@ public class ObdProvider {
                             }
                             try {
                                 coolantTempCommand.run(socket.getInputStream(), socket.getOutputStream());
-
-                                Log.d("OBDHACK_RES", "Coolant temp: " + coolantTempCommand.getResult());
+                                coolantTemp = getIntValue(coolantTempCommand.getResult(), 2) - 40;
+                                Log.d("OBDHACK_RES", "Coolant temp: " + coolantTemp);
 
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -241,37 +191,36 @@ public class ObdProvider {
                             }
 
                             try {
-                                runtimeCommand.run(socket.getInputStream(), socket.getOutputStream());
-
-                                Log.d("OBDHACK_RES", "Runtime since start: " + runtimeCommand.getResult());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E8: " + e);
-                            }
-
-                            try {
                                 fuelLevelCommand.run(socket.getInputStream(), socket.getOutputStream());
-
-                                Log.d("OBDHACK_RES", "Fuel level: " + fuelLevelCommand.getResult());
+                                fuelLevel = getIntValue(fuelLevelCommand.getResult(), 2)*100/255;
+                                Log.d("OBDHACK_RES", "Fuel level: " + fuelLevel);
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 Log.d("OBDHACK", "E9: " + e);
                             }
-
                             try {
-                                egrErrorCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                Log.d("OBDHACK_RES", "Egr err: " + egrErrorCommand.getResult());
+                                fuelPressureCommand.run(socket.getInputStream(), socket.getOutputStream());
+                                fuelPressure = getIntValue(fuelPressureCommand.getResult(), 2) * 3;
+                                Log.d("OBDHACK_RES", "Fuel level: " + fuelPressure);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                Log.d("OBDHACK", "E10: " + e);
+                                Log.d("OBDHACK", "E9: " + e);
                             }
                             try {
-                                commandedEgrErrorCommand.run(socket.getInputStream(), socket.getOutputStream());
-
-                                Log.d("OBDHACK_RES", "Commanded egr err: " + commandedEgrErrorCommand.getResult());
+                                consumptionRateCommand.run(socket.getInputStream(), socket.getOutputStream());
+                                consumptionRate = getIntValue(consumptionRateCommand.getResult(), 4) / 20;
+                                Log.d("OBDHACK_RES", "Fuel level: " + consumptionRateCommand.getResult());
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                Log.d("OBDHACK", "E11: " + e);
+                                Log.d("OBDHACK", "E9: " + e);
+                            }
+                            try {
+                                barometricPressureCommand.run(socket.getInputStream(), socket.getOutputStream());
+                                barometricPressure = getIntValue(barometricPressureCommand.getResult(), 2);
+                                Log.d("OBDHACK_RES", "Fuel level: " + barometricPressureCommand.getResult());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                Log.d("OBDHACK", "E9: " + e);
                             }
 
                             //obdCommand.run(socket.getInputStream(), socket.getOutputStream());
@@ -293,6 +242,10 @@ public class ObdProvider {
             e.printStackTrace();
             Log.d("OBDHACK", "E: " + e);
         }
+    }
+
+    private int getIntValue(String result, int rightBits) {
+        return Integer.parseInt(result.substring(result.length()-rightBits), 16);
     }
 
 }
