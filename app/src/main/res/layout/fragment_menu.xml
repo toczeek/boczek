@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"/>
 
-            <com.github.glomadrian.velocimeterlibrary.VelocimeterView
+            <com.example.toczek.wrumwrum.Utils.views.VelocimeterView
                 android:layout_gravity="center"
                 android:id="@+id/rpmVelocimeter"
                 android:layout_width="200dp"
@@ -57,7 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"/>
-            <com.github.glomadrian.velocimeterlibrary.VelocimeterView
+            <com.example.toczek.wrumwrum.Utils.views.VelocimeterView
                 android:layout_gravity="center"
                 android:id="@+id/speedVelocimeter"
                 android:layout_width="200dp"

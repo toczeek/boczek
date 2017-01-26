@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.example.toczek.wrumwrum.Fragments.DetailsFragment;
 import com.example.toczek.wrumwrum.Utils.providers.Fragments.DetailsFragmentProvider;
+import com.example.toczek.wrumwrum.Utils.providers.Fragments.ErrorFragmentProvider;
 import com.example.toczek.wrumwrum.Utils.providers.Fragments.MenuFragmentProvider;
 
 import com.example.toczek.wrumwrum.Dagger.ApplicationComponent;
@@ -28,4 +29,7 @@ public class MyApplication extends Application {
     }
 
 
+    public static void inject(ErrorFragmentProvider errorFragmentProvider) {
+        mApplicationComponent.inject(errorFragmentProvider);
+    }
 }

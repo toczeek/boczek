@@ -20,9 +20,10 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.toczek.wrumwrum.R;
+import com.example.toczek.wrumwrum.Utils.models.ValueItem;
 import com.example.toczek.wrumwrum.Utils.providers.Fragments.MenuFragmentProvider;
 import com.example.toczek.wrumwrum.Utils.providers.Obd.ObdListener;
-import com.github.glomadrian.velocimeterlibrary.VelocimeterView;
+import com.example.toczek.wrumwrum.Utils.views.VelocimeterView;
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.AbsoluteLoadCommand;
@@ -48,6 +49,7 @@ import java.util.UUID;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 
 import static android.content.ContentValues.TAG;
 
@@ -58,12 +60,28 @@ import static android.content.ContentValues.TAG;
 public class MenuFragment extends Fragment implements ObdListener {
 
     private MenuFragmentProvider mMenuFragmentProvider;
+    final CharSequence[] itemNames = {
+            "Prędkość", "Obroty", "Temperatura powietrza", "Temperatura płynu chłodniczego", "Temperatura oleju",
+            "Spalanie", "Ciśnienie atmosferyczne", "Ciśnienie paliwa", "Poziom paliwa"
+    };
+    ValueItem selectedVelue1;
+    ValueItem selectedVelue2;
     @BindView(R.id.button1)
     Button mButton;
     @BindView(R.id.rpmVelocimeter)
     VelocimeterView rpmVelocimeter;
     @BindView(R.id.speedVelocimeter)
     VelocimeterView speedVelocimeter;
+    @OnLongClick(R.id.speedVelocimeter)
+    public boolean selectFirstVelocimeter() {
+        showSelectVolicmeterDialog(speedVelocimeter, selectedVelue1);
+        return false;
+    }
+    @OnLongClick(R.id.rpmVelocimeter)
+    public boolean selectSecondVelocimeter() {
+        showSelectVolicmeterDialog(rpmVelocimeter, selectedVelue2);
+        return false;
+    }
     @OnClick(R.id.button1)
     public void onClickBtn1() {
         showHelpDialog();
@@ -78,6 +96,10 @@ public class MenuFragment extends Fragment implements ObdListener {
         View view = inflater.inflate(R.layout.fragment_menu, container, false);
         ButterKnife.bind(this, view);
         mMenuFragmentProvider = new MenuFragmentProvider();
+        selectedVelue1 = new ValueItem();
+        selectedVelue2 = new ValueItem();
+        selectedVelue1.setId(0);
+        selectedVelue2.setId(1);
         return view;
     }
     private void showHelpDialog() {
@@ -94,6 +116,20 @@ public class MenuFragment extends Fragment implements ObdListener {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         dialog.show();
+    }
+    private void showSelectVolicmeterDialog(final VelocimeterView velocimeterView, final ValueItem valueItem) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Wybór wskaźnika");
+        builder.setItems(itemNames, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int itemId) {
+                valueItem.setId(itemId);
+                mMenuFragmentProvider.optionCombiner(valueItem);
+                velocimeterView.setMax(valueItem.getMaxValue());
+                velocimeterView.setUnits(getContext(), valueItem.getUnit());
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
     private void showBTDeviceDialog() {
         ArrayList deviceStrs = new ArrayList();
@@ -140,8 +176,10 @@ public class MenuFragment extends Fragment implements ObdListener {
     @Override
     public void wasUpdate() {
         if (mMenuFragmentProvider != null) {
-            speedVelocimeter.setValue(mMenuFragmentProvider.getSpeed(), false);
-            rpmVelocimeter.setValue(mMenuFragmentProvider.getRpm(), false);
+            mMenuFragmentProvider.optionCombiner(selectedVelue1);
+            mMenuFragmentProvider.optionCombiner(selectedVelue2);
+            speedVelocimeter.setValue(selectedVelue1.getValue(), false);
+            rpmVelocimeter.setValue(selectedVelue2.getValue(), false);
         }
     }
 
