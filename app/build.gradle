@@ -42,7 +42,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
     compile 'com.github.navasmdc:MaterialDesign:1.5@aar'
-    compile 'com.github.pires:obd-java-api:1.0'
     compile 'com.github.glomadrian:velocimeterlibrary:1.0'
     provided "org.projectlombok:lombok:1.12.6"
     compile 'com.github.anastr:speedviewlib:1.1.2'

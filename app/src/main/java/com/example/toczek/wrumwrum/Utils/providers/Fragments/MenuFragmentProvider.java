@@ -20,39 +20,39 @@ public class MenuFragmentProvider {
         mObdProvider.setMode(0);
     }
 
-    public int getSpeedValue() {
+    public String getSpeedValue() {
         return mObdProvider.getSpeedValue();
     }
 
-    public int getRpmValue() {
+    public String getRpmValue() {
         return mObdProvider.getRpmValue();
     }
 
-    public int getAirTemp() {
+    public String getAirTemp() {
         return mObdProvider.getAirTemp();
     }
 
-    public int getCoolantTemp() {
+    public String getCoolantTemp() {
         return mObdProvider.getCoolantTemp();
     }
 
-    public int getOilTemp() {
+    public String getOilTemp() {
         return mObdProvider.getOilTemp();
     }
 
-    public int getFuelLevel() {
+    public String getFuelLevel() {
         return mObdProvider.getFuelLevel();
     }
 
-    public int getConsumptionRate() {
+    public String getConsumptionRate() {
         return mObdProvider.getConsumptionRate();
     }
 
-    public int getBarometricPressure() {
+    public String getBarometricPressure() {
         return mObdProvider.getBarometricPressure();
     }
 
-    public int getFuelPressure() {
+    public String getFuelPressure() {
         return mObdProvider.getFuelPressure();
     }
 

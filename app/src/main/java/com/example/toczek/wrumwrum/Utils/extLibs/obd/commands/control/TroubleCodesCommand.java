@@ -1,4 +1,4 @@
-package com.example.toczek.wrumwrum.Utils.obdCommands; /**
+/**
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
@@ -10,9 +10,11 @@ package com.example.toczek.wrumwrum.Utils.obdCommands; /**
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+package com.example.toczek.wrumwrum.Utils.extLibs.Obd.commands.control;
 
-import com.github.pires.obd.commands.ObdCommand;
-import com.github.pires.obd.enums.AvailableCommandNames;
+
+import com.example.toczek.wrumwrum.Utils.extLibs.Obd.commands.ObdCommand;
+import com.example.toczek.wrumwrum.Utils.extLibs.Obd.enums.AvailableCommandNames;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,47 +27,39 @@ import java.io.InputStream;
  * If we find out DTC P0000 that mean no message are we can end.
  *
  */
-public class PermanentTroubleCodesCommand extends ObdCommand {
+public class TroubleCodesCommand extends ObdCommand {
 
-    /**
-     * Constant <code>dtcLetters={'P', 'C', 'B', 'U'}</code>
-     */
+    /** Constant <code>dtcLetters={'P', 'C', 'B', 'U'}</code> */
     protected final static char[] dtcLetters = {'P', 'C', 'B', 'U'};
-    /**
-     * Constant <code>hexArray="0123456789ABCDEF".toCharArray()</code>
-     */
+    /** Constant <code>hexArray="0123456789ABCDEF".toCharArray()</code> */
     protected final static char[] hexArray = "0123456789ABCDEF".toCharArray();
 
     protected StringBuilder codes = null;
 
     /**
-     * <p>Constructor for PermanentTroubleCodesCommand.</p>
+     * <p>Constructor for TroubleCodesCommand.</p>
      */
-    public PermanentTroubleCodesCommand() {
-        super("0A");
+    public TroubleCodesCommand() {
+        super("03");
         codes = new StringBuilder();
     }
 
     /**
      * Copy ctor.
      *
-     * @param other a {@link com.github.pires.obd.commands.control.PermanentTroubleCodesCommand} object.
+     * @param other a {@link TroubleCodesCommand} object.
      */
-    public PermanentTroubleCodesCommand(PermanentTroubleCodesCommand other) {
+    public TroubleCodesCommand(TroubleCodesCommand other) {
         super(other);
         codes = new StringBuilder();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void fillBuffer() {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void performCalculations() {
         final String result = getResult();
@@ -75,14 +69,15 @@ public class PermanentTroubleCodesCommand extends ObdCommand {
         String canOneFrame = result.replaceAll("[\r\n]", "");
         int canOneFrameLength = canOneFrame.length();
         if (canOneFrameLength <= 16 && canOneFrameLength % 4 == 0) {//CAN(ISO-15765) protocol one frame.
-            workingData = canOneFrame;//4Ayy{codes}
-            startIndex = 4;//Header is 4Ayy, yy showing the number of data items.
+            workingData = canOneFrame;//43yy{codes}
+            startIndex = 4;//Header is 43yy, yy showing the number of data items.
         } else if (result.contains(":")) {//CAN(ISO-15765) protocol two and more frames.
-            workingData = result.replaceAll("[\r\n].:", "");//xxx4Ayy{codes}
-            startIndex = 7;//Header is xxx4Ayy, xxx is bytes of information to follow, yy showing the number of data items.
+            workingData = result.replaceAll("[\r\n].:", "");//xxx43yy{codes}
+            startIndex = 7;//Header is xxx43yy, xxx is bytes of information to follow, yy showing the number of data items.
         } else {//ISO9141-2, KWP2000 Fast and KWP2000 5Kbps (ISO15031) protocols.
-            workingData = result.replaceAll("^4A|[\r\n]4A|[\r\n]", "");
+            workingData = result.replaceAll("^43|[\r\n]43|[\r\n]", "");
         }
+        codes = new StringBuilder();
         for (int begin = startIndex; begin < workingData.length(); begin += 4) {
             String dtc = "";
             byte b1 = hexStringToByteArray(workingData.charAt(begin));
@@ -90,14 +85,12 @@ public class PermanentTroubleCodesCommand extends ObdCommand {
             int ch2 = ((b1 & 0x30) >> 4);
             dtc += dtcLetters[ch1];
             dtc += hexArray[ch2];
-            dtc += workingData.substring(begin + 1, begin + 4);
+            dtc += workingData.substring(begin+1, begin + 4);
             if (dtc.equals("P0000")) {
                 return;
             }
-            if (!String.valueOf(codes).contains(dtc)) {
-                codes.append(dtc);
-                codes.append('\n');
-            }
+            codes.append(dtc);
+            codes.append('\n');
         }
     }
 
@@ -115,18 +108,14 @@ public class PermanentTroubleCodesCommand extends ObdCommand {
         return codes.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public String getCalculatedResult() {
         return String.valueOf(codes);
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     protected void readRawData(InputStream in) throws IOException {
         byte b;
@@ -155,20 +144,16 @@ public class PermanentTroubleCodesCommand extends ObdCommand {
 
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public String getFormattedResult() {
         return codes.toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public String getName() {
-        return AvailableCommandNames.PERMANENT_TROUBLE_CODES.getValue();
+        return AvailableCommandNames.TROUBLE_CODES.getValue();
     }
 
 }
