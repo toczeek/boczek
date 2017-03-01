@@ -51,7 +51,7 @@ public class ErrorFragment extends Fragment implements ObdListener {
         });
     }
     private void getData() {
-        mTroubleCodesTv.setText("Trouble Codes : "+mErrorFragmentProvider.getTroubleCodes());
+        mTroubleCodesTv.setText(""+mErrorFragmentProvider.getTroubleCodes());
     }
     }
 
