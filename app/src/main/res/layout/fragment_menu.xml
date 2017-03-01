@@ -14,7 +14,7 @@
         android:text="Połącz"
         android:textColor="@color/colorFont"
         android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+        android:layout_marginBottom="@dimen/activity_vertical_margin" />
     <Button
         android:id="@+id/button1"
         android:layout_width="wrap_content"
@@ -22,46 +22,38 @@
         android:background="@color/colorButton"
         android:text="Pomoc"
         android:textColor="@color/colorFont"
-        android:layout_gravity="center" />
-
-
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/activity_vertical_margin" />
 
         <LinearLayout
             android:layout_gravity="center"
             android:orientation="vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="@dimen/activity_vertical_margin" >
 
             <com.example.toczek.wrumwrum.Utils.views.VelocimeterView
                 android:layout_gravity="center"
                 android:id="@+id/firstVelocimeter"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 app:max="8000"
                 app:units="rpm"
             />
         </LinearLayout>
 
-
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" >
             <com.example.toczek.wrumwrum.Utils.views.VelocimeterView
                 android:layout_gravity="center"
                 android:id="@+id/secondVelocimeter"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 app:units="km/h"
                 />
         </LinearLayout>

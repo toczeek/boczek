@@ -48,16 +48,16 @@ public class ObdProvider {
     private int mode; //TODO : change to state object
 
     //VALUES
-    private String rpmValue;
-    private String speedValue;
+    private int rpmValue;
+    private int speedValue;
 
-    private String airTemp;
-    private String coolantTemp;
-    private String oilTemp;
-    private String fuelLevel;
-    private String consumptionRate;
-    private String barometricPressure;
-    private String fuelPressure;
+    private int airTemp;
+    private int coolantTemp;
+    private int oilTemp;
+    private int fuelLevel;
+    private int consumptionRate;
+    private int barometricPressure;
+    private int fuelPressure;
     private String troubleCodes = "";
     private String pendingTroubleCodes = "";
     private String permanentTroubleCodes = "";
@@ -74,8 +74,6 @@ public class ObdProvider {
     private ConsumptionRateCommand consumptionRateCommand = null;
     private BarometricPressureCommand barometricPressureCommand = null;
     private TroubleCodesCommand troubleCodesCommand = null;
-    private PendingTroubleCodesCommand pendingTroubleCodesCommand = null;
-    private PermanentTroubleCodesCommand permanentTroubleCodesCommand = null;
 
     public ObdProvider() {
         handlerThread = new HandlerThread("");
@@ -98,7 +96,7 @@ public class ObdProvider {
             socket = device.createInsecureRfcommSocketToServiceRecord(uuid);
             socket.connect();
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         //Log.d("OBDlog", "5-------------: ");
     }
@@ -108,27 +106,33 @@ public class ObdProvider {
         try {
             new ObdResetCommand().run(socket.getInputStream(), socket.getOutputStream());
             //Below is to give the adapter enough time to reset before sending the commands, otherwise the first startup commands could be ignored.
-            try { Thread.sleep(500); } catch (InterruptedException e) { e.printStackTrace(); }
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) { //e.printStackTrace(); }
 
-            //Log.d("OBDlog", "3333333333333333333-------------: ");
-            new EchoOffCommand().run(socket.getInputStream(), socket.getOutputStream());
-            //Log.d("OBDlog", "7-------------: ");
-            new LineFeedOffCommand().run(socket.getInputStream(), socket.getOutputStream());
-            //Log.d("OBDlog", "8-------------: ");
-            new TimeoutCommand(10).run(socket.getInputStream(), socket.getOutputStream());
-            //Log.d("OBDlog", "9-------------: ");
-            new SelectProtocolCommand(ObdProtocols.AUTO).run(socket.getInputStream(), socket.getOutputStream());
+                //Log.d("OBDlog", "3333333333333333333-------------: ");
+                new EchoOffCommand().run(socket.getInputStream(), socket.getOutputStream());
+                //Log.d("OBDlog", "7-------------: ");
+                new LineFeedOffCommand().run(socket.getInputStream(), socket.getOutputStream());
+                //Log.d("OBDlog", "8-------------: ");
+                new TimeoutCommand(62).run(socket.getInputStream(), socket.getOutputStream());
+                //Log.d("OBDlog", "9-------------: ");
+                new SelectProtocolCommand(ObdProtocols.AUTO).run(socket.getInputStream(), socket.getOutputStream());
+            } catch (Exception e) {
+                //e.printStackTrace();
+                //Log.d("OBDlog", "ER: " + e);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            //Log.d("OBDlog", "ER: " + e);
         }
     }
-    
+
     public void setupCommands() {
         try {
             rpmCommand = new RPMCommand();
             speedCommand = new SpeedCommand();
 
+            ambientAirTemperatureCommand = new AmbientAirTemperatureCommand();
             oilTempCommand = new OilTempCommand();
             coolantTempCommand = new EngineCoolantTemperatureCommand();
             fuelLevelCommand = new FuelLevelCommand();
@@ -136,10 +140,8 @@ public class ObdProvider {
             consumptionRateCommand = new ConsumptionRateCommand();
             barometricPressureCommand = new BarometricPressureCommand();
             troubleCodesCommand = new TroubleCodesCommand();
-            pendingTroubleCodesCommand = new PendingTroubleCodesCommand();
-            permanentTroubleCodesCommand = new PermanentTroubleCodesCommand();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             //Log.d("OBDlog", "ER: " + e);
         }
 
@@ -153,7 +155,7 @@ public class ObdProvider {
                     while(true) {
                             try {
                                 rpmCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                rpmValue = rpmCommand.getCalculatedResult();
+                                rpmValue = getIntValue(rpmCommand.getResult(), 4)/4;
                                 //Log.d("OBDHACK_RES", "Rpm: " + rpmValue);
 
                             } catch (Exception e) {
@@ -162,7 +164,7 @@ public class ObdProvider {
                             }
                             try {
                                 speedCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                speedValue = speedCommand.getCalculatedResult();
+                                speedValue = getIntValue(speedCommand.getResult(), 2);
                                 //Log.d("OBDHACK_RES", "Speed: " + speedValue);
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -171,7 +173,7 @@ public class ObdProvider {
                         
                             try {
                                 ambientAirTemperatureCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                airTemp = ambientAirTemperatureCommand.getCalculatedResult();
+                                airTemp = getIntValue(ambientAirTemperatureCommand.getResult(), 2) - 40;
                                 //Log.d("OBDHACK_RES", "Air temp: " + airTemp);
 
                             } catch (Exception e) {
@@ -180,7 +182,7 @@ public class ObdProvider {
                             }
                             try {
                                 oilTempCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                oilTemp = oilTempCommand.getCalculatedResult();
+                                oilTemp = getIntValue(oilTempCommand.getResult(), 2) - 40;
                                 //Log.d("OBDHACK_RES", "Oil temp: " + oilTemp);
 
                             } catch (Exception e) {
@@ -189,7 +191,7 @@ public class ObdProvider {
                             }
                             try {
                                 coolantTempCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                coolantTemp = coolantTempCommand.getCalculatedResult();
+                                coolantTemp = getIntValue(coolantTempCommand.getResult(), 2) - 40;
                                 //Log.d("OBDHACK_RES", "Coolant temp: " + coolantTemp);
 
                             } catch (Exception e) {
@@ -199,7 +201,7 @@ public class ObdProvider {
 
                             try {
                                 fuelLevelCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                fuelLevel = fuelLevelCommand.getCalculatedResult();
+                                fuelLevel = getIntValue(fuelLevelCommand.getResult(), 2)*100/255;
                                 //Log.d("OBDHACK_RES", "Fuel level: " + fuelLevel);
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -207,7 +209,7 @@ public class ObdProvider {
                             }
                             try {
                                 fuelPressureCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                fuelPressure = fuelPressureCommand.getCalculatedResult();
+                                fuelPressure = getIntValue(fuelPressureCommand.getResult(), 2) * 3;
                                 //Log.d("OBDHACK_RES", "Fuel level: " + fuelPressure);
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -215,7 +217,7 @@ public class ObdProvider {
                             }
                             try {
                                 consumptionRateCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                consumptionRate = consumptionRateCommand.getCalculatedResult();
+                                consumptionRate = getIntValue(consumptionRateCommand.getResult(), 4) / 20;
                                 //Log.d("OBDHACK_RES", "Fuel level: " + consumptionRateCommand.getResult());
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -223,7 +225,7 @@ public class ObdProvider {
                             }
                             try {
                                 barometricPressureCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                barometricPressure = barometricPressureCommand.getCalculatedResult();
+                                barometricPressure = getIntValue(barometricPressureCommand.getResult(), 2);
                                 //Log.d("OBDHACK_RES", "Fuel level: " + barometricPressureCommand.getResult());
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -237,23 +239,6 @@ public class ObdProvider {
                                 e.printStackTrace();
                                 Log.d("OBDHACK", "E9: " + e);
                             }
-                            try {
-                                pendingTroubleCodesCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                pendingTroubleCodes = pendingTroubleCodesCommand.getCalculatedResult();
-                                Log.d("OBDHACK_RES", "Pending Trouble Codes: " + pendingTroubleCodes);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E9: " + e);
-                            }
-                            try {
-                                permanentTroubleCodesCommand.run(socket.getInputStream(), socket.getOutputStream());
-                                permanentTroubleCodes = permanentTroubleCodesCommand.getCalculatedResult();
-                                Log.d("OBDHACK_RES", "Permanent Trouble Codes: " + permanentTroubleCodes);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Log.d("OBDHACK", "E9: " + e);
-                            }
-
                             //obdCommand.run(socket.getInputStream(), socket.getOutputStream());
 
 
@@ -272,6 +257,10 @@ public class ObdProvider {
             e.printStackTrace();
             //Log.d("OBDHACK", "E: " + e);
         }
+    }
+
+    private int getIntValue(String result, int rightBits) {
+        return Integer.parseInt(result.substring(result.length()-rightBits), 16);
     }
 
 }

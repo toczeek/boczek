@@ -24,10 +24,7 @@ public class ErrorFragment extends Fragment implements ObdListener {
     private ErrorFragmentProvider mErrorFragmentProvider;
     @BindView(R.id.error_fragment_trouble_codes)
     TextView mTroubleCodesTv;
-    @BindView(R.id.error_fragment_pending_trouble_codes)
-    TextView mPendingTroubleCodesTv;
-    @BindView(R.id.error_fragment_permanent_trouble_codes)
-    TextView mPermanentTroubleCodesTv;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -55,8 +52,6 @@ public class ErrorFragment extends Fragment implements ObdListener {
     }
     private void getData() {
         mTroubleCodesTv.setText("Trouble Codes : "+mErrorFragmentProvider.getTroubleCodes());
-        mPendingTroubleCodesTv.setText("Pending Trouble Codes : "+mErrorFragmentProvider.getPendingTroubleCodes());
-        mPermanentTroubleCodesTv.setText("Trouble Codes : "+mErrorFragmentProvider.getPendingTroubleCodes());
     }
     }
 

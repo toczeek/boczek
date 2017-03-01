@@ -19,31 +19,31 @@ public class DetailsFragmentProvider {
         mObdProvider.setMode(1);
     }
 
-    public String getAirTemp() {
+    public int getAirTemp() {
         return mObdProvider.getAirTemp();
     }
 
-    public String getCoolantTemp() {
+    public int getCoolantTemp() {
         return mObdProvider.getCoolantTemp();
     }
 
-    public String getOilTemp() {
+    public int getOilTemp() {
         return mObdProvider.getOilTemp();
     }
 
-    public String getFuelLevel() {
+    public int getFuelLevel() {
         return mObdProvider.getFuelLevel();
     }
 
-    public String getConsumptionRate() {
+    public int getConsumptionRate() {
         return mObdProvider.getConsumptionRate();
     }
 
-    public String getBarometricPressure() {
+    public int getBarometricPressure() {
         return mObdProvider.getBarometricPressure();
     }
 
-    public String getFuelPressure() {
+    public int getFuelPressure() {
         return mObdProvider.getFuelPressure();
     }
 

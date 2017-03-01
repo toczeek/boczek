@@ -20,86 +20,86 @@ public class MenuFragmentProvider {
         mObdProvider.setMode(0);
     }
 
-    public String getSpeedValue() {
+    public int getSpeedValue() {
         return mObdProvider.getSpeedValue();
     }
 
-    public String getRpmValue() {
+    public int getRpmValue() {
         return mObdProvider.getRpmValue();
     }
 
-    public String getAirTemp() {
+    public int getAirTemp() {
         return mObdProvider.getAirTemp();
     }
 
-    public String getCoolantTemp() {
+    public int getCoolantTemp() {
         return mObdProvider.getCoolantTemp();
     }
 
-    public String getOilTemp() {
+    public int getOilTemp() {
         return mObdProvider.getOilTemp();
     }
 
-    public String getFuelLevel() {
+    public int getFuelLevel() {
         return mObdProvider.getFuelLevel();
     }
 
-    public String getConsumptionRate() {
+    public int getConsumptionRate() {
         return mObdProvider.getConsumptionRate();
     }
 
-    public String getBarometricPressure() {
+    public int getBarometricPressure() {
         return mObdProvider.getBarometricPressure();
     }
 
-    public String getFuelPressure() {
+    public int getFuelPressure() {
         return mObdProvider.getFuelPressure();
     }
 
     public ValueItem optionCombiner(ValueItem valueItem) {
         switch (valueItem.getId()){
             case 0:
-                valueItem.setValue(mObdProvider.getSpeedValue());
+                valueItem.setValue(Integer.toString(mObdProvider.getSpeedValue()));
                 valueItem.setMaxValue(255);
                 valueItem.setUnit("KM/h");
                 break;
             case 1:
-                valueItem.setValue(mObdProvider.getRpmValue());
+                valueItem.setValue(Integer.toString(mObdProvider.getRpmValue()));
                 valueItem.setMaxValue(16000);
                 valueItem.setUnit("RPM");
                 break;
             case 2:
-                valueItem.setValue(mObdProvider.getAirTemp());
+                valueItem.setValue(Integer.toString(mObdProvider.getAirTemp()));
                 valueItem.setMaxValue(215);
                 valueItem.setUnit("°C");
                 break;
             case 3:
-                valueItem.setValue(mObdProvider.getCoolantTemp());
+                valueItem.setValue(Integer.toString(mObdProvider.getCoolantTemp()));
                 valueItem.setMaxValue(210);
                 valueItem.setUnit("°C");
                 break;
             case 4:
-                valueItem.setValue(mObdProvider.getOilTemp());
+                valueItem.setValue(Integer.toString(mObdProvider.getOilTemp()));
                 valueItem.setMaxValue(210);
                 valueItem.setUnit("°C");
                 break;
             case 5:
-                valueItem.setValue(mObdProvider.getConsumptionRate());
+                valueItem.setValue(Integer.toString(mObdProvider.getConsumptionRate()));
                 valueItem.setMaxValue(3000);
                 valueItem.setUnit("l/h");
                 break;
             case 6:
-                valueItem.setValue(mObdProvider.getBarometricPressure());
+                valueItem.setValue(Integer.toString(mObdProvider.getBarometricPressure()));
                 valueItem.setMaxValue(255);
                 valueItem.setUnit("kPa");
                 break;
             case 7:
-                valueItem.setValue(mObdProvider.getFuelPressure());
+                valueItem.setValue(Integer.toString(mObdProvider.getFuelPressure()));
                 valueItem.setMaxValue(765);
                 valueItem.setUnit("kPa");
                 break;
             case 8:
-                valueItem.setValue(mObdProvider.getFuelLevel());
+                valueItem.setValue(Integer.toString(mObdProvider.getFuelLevel()));
                 valueItem.setMaxValue(100);
                 valueItem.setUnit("%");
                 break;

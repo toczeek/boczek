@@ -23,13 +23,4 @@ public class ErrorFragmentProvider {
         return mObdProvider.getTroubleCodes();
     }
 
-    public String getPendingTroubleCodes() {
-        return mObdProvider.getPendingTroubleCodes();
-    }
-
-    public String getPermanentTroubleCodes() {
-        return mObdProvider.getPermanentTroubleCodes();
-    }
-
-
 }
